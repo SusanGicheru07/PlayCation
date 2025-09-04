@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+
+# Django
+db.sqlite3
+/media
+/staticfiles
+
+# Environment
+.env
+env/
+venv/
+
+# VS Code
+.vscode/
+
+# Docker
+*.log
+*.pid
+*.seed
+*.pid.lock
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+__pycache__/
+.env
+*.db
+
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyo
+*.pyd
+
+# Docker
+*.log
+*.pid
+__pycache__/
+.dockerignore
