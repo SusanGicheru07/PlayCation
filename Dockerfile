@@ -1,5 +1,5 @@
 # Use official Python image
-FROM python:3.12-slim
+FROM python:3.12
 
 # Set environment vars
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -20,6 +20,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
+RUN apt-get update && apt-get install -y ffmpeg
 
 
 # Run gunicorn server (production)
