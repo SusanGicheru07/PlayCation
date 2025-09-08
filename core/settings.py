@@ -7,9 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 from decouple import config
 import os
 
-SECRET_KEY = config("SECRET_KEY", default="unsafe-secret-key")
-DEBUG = config("DEBUG", default=False, cast=bool)
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="").split(",")
+SECRET_KEY = "django-insecure-u$)#!8xzav2$wp8_)j72(bdbe5!-4wrv52vq)4!sh*%g)m&1in" #config("SECRET_KEY", default="unsafe-secret-key")
+DEBUG = True #config("DEBUG", default=False, cast=bool)
+ALLOWED_HOSTS = ["*"] #config("ALLOWED_HOSTS", default="").split(",")
 
 # Static files
 STATIC_URL = '/static/'
@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    "rest_framework",
 
     # Apps
     'apps.outdoor',
@@ -46,7 +48,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

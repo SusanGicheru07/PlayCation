@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayCation - Discover Events Near You</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #e5e7eb;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+            --border-color: #d1d5db;
+            --text-muted: #6b7280;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark-color);
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            text-decoration: none;
+        }
+
+        .navbar-brand:hover {
+            color: var(--primary-dark) !important;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-item {
+            padding: 0.7rem 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        /* Main Container */
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            margin: 2rem auto;
+            overflow: hidden;
+        }
+
+        /* Location Banner */
+        .location-banner {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .location-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: var(--light-color);
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-form {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--secondary-color);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.15);
+        }
+
+        .btn-search {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-search:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Events Section */
+        .events-section {
+            padding: 2rem;
+        }
+
+        .events-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-count {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .sort-dropdown {
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+        }
+
+        /* Event Cards */
+        .event-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .event-image {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            position: relative;
+        }
+
+        .event-date-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .event-content {
+            padding: 1.5rem;
+        }
+
+        .event-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .event-details {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .event-detail-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .event-detail-item i {
+            width: 20px;
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .event-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--success-color);
+        }
+
+        .event-tags {
+            margin-top: 1rem;
+        }
+
+        .event-tag {
+            display: inline-block;
+            background: var(--secondary-color);
+            color: var(--text-muted);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-interested {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-interested:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            border: 3px solid var(--secondary-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                border-radius: 15px;
+            }
+
+            .search-section {
+                padding: 1.5rem;
+            }
+
+            .search-form {
+                padding: 1rem;
+            }
+
+            .events-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .event-image {
+                height: 150px;
+                font-size: 2rem;
+            }
+
+            .event-content {
+                padding: 1rem;
+            }
+
+            .btn-search {
+                width: 100%;
+                margin-top: 1rem;
+            }
+        }
+
+        /* Utility Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-calendar-alt me-2"></i>PlayCation
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-2"></i>Account
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="showLogin()"><i class="fas fa-sign-in-alt me-2"></i>Login</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="showRegister()"><i class="fas fa-user-plus me-2"></i>Register</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="showProfile()" style="display: none;" id="profileLink"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()" style="display: none;" id="logoutLink"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="main-container">
+            <!-- Location Banner -->
+            <div class="location-banner">
+                <div class="location-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h4 id="locationText">Detecting your location...</h4>
+                <p class="mb-0" id="locationSubtext">Finding exciting events around you</p>
+            </div>
+
+            <!-- Search Section -->
+            <div class="search-section">
+                <div class="search-form">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="searchQuery" placeholder="Search events...">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="categoryFilter">
+                                <option value="">All Categories</option>
+                                <option value="music">Music</option>
+                                <option value="sports">Sports</option>
+                                <option value="food">Food & Drink</option>
+                                <option value="business">Business</option>
+                                <option value="arts">Arts & Culture</option>
+                                <option value="tech">Technology</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" class="form-control" id="dateFilter">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary btn-search" onclick="searchEvents()">
+                                <i class="fas fa-search me-1"></i>Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events Section -->
+            <div class="events-section">
+                <div class="events-header">
+                    <div>
+                        <h3>Events Near You</h3>
+                        <p class="results-count" id="resultsCount">Loading events...</p>
+                    </div>
+                    <select class="sort-dropdown" id="sortBy" onchange="sortEvents()">
+                        <option value="date">Sort by Date</option>
+                        <option value="distance">Sort by Distance</option>
+                        <option value="popularity">Sort by Popularity</option>
+                        <option value="price">Sort by Price</option>
+                    </select>
+                </div>
+
+                <!-- Loading -->
+                <div class="loading" id="loadingSection">
+                    <div class="spinner"></div>
+                    <p>Finding amazing events for you...</p>
+                </div>
+
+                <!-- Events List -->
+                <div id="eventsList" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let userLocation = { lat: null, lng: null, city: 'Unknown Location' };
+        let allEvents = [];
+        let filteredEvents = [];
+
+        // Sample event data
+        const sampleEvents = [
+            {
+                id: 1,
+                title: "Summer Music Festival",
+                category: "music",
+                date: "2025-09-15",
+                time: "18:00",
+                location: "Central Park Amphitheater",
+                distance: "2.3 km",
+                price: "Free",
+                attendees: 1250,
+                description: "Join us for an evening of live music featuring local and international artists.",
+                tags: ["Live Music", "Outdoor", "Family Friendly"],
+                icon: "🎵"
+            },
+            {
+                id: 2,
+                title: "Tech Innovation Summit",
+                category: "tech",
+                date: "2025-09-18",
+                time: "09:00",
+                location: "Convention Center",
+                distance: "4.1 km",
+                price: "$45",
+                attendees: 850,
+                description: "Discover the latest in technology and innovation from industry leaders.",
+                tags: ["Technology", "Networking", "Professional"],
+                icon: "💻"
+            },
+            {
+                id: 3,
+                title: "Food Truck Rally",
+                category: "food",
+                date: "2025-09-12",
+                time: "12:00",
+                location: "Riverside Park",
+                distance: "1.8 km",
+                price: "Free Entry",
+                attendees: 2100,
+                description: "Taste amazing dishes from the city's best food trucks.",
+                tags: ["Food", "Outdoor", "Weekend"],
+                icon: "🍔"
+            },
+            {
+                id: 4,
+                title: "Art Gallery Opening",
+                category: "arts",
+                date: "2025-09-20",
+                time: "19:00",
+                location: "Modern Art Museum",
+                distance: "3.7 km",
+                price: "$15",
+                attendees: 320,
+                description: "Exclusive opening of contemporary art exhibition featuring emerging artists.",
+                tags: ["Art", "Culture", "Evening"],
+                icon: "🎨"
+            },
+            {
+                id: 5,
+                title: "Marathon Training Run",
+                category: "sports",
+                date: "2025-09-14",
+                time: "07:00",
+                location: "City Stadium",
+                distance: "5.2 km",
+                price: "Free",
+                attendees: 450,
+                description: "Join our community for a morning training run. All levels welcome!",
+                tags: ["Running", "Fitness", "Morning"],
+                icon: "🏃‍♀️"
+            },
+            {
+                id: 6,
+                title: "Business Networking Mixer",
+                category: "business",
+                date: "2025-09-19",
+                time: "17:30",
+                location: "Downtown Hotel",
+                distance: "6.1 km",
+                price: "$25",
+                attendees: 180,
+                description: "Connect with local business professionals over drinks and appetizers.",
+                tags: ["Networking", "Professional", "Evening"],
+                icon: "👔"
+            }
+        ];
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            getUserLocation();
+            setTimeout(() => {
+                loadEvents();
+            }, 2000); // Simulate loading time
+        });
+
+        // Get user's location
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        userLocation.lat = position.coords.latitude;
+                        userLocation.lng = position.coords.longitude;
+
+                        console.log(`User location: ${userLocation.lat}, ${userLocation.lng}`);
+                        
+                        // Simulate reverse geocoding
+                        const cities = ['New York, NY', 'Los Angeles, CA', 'Chicago, IL', 'Houston, TX', 'Phoenix, AZ'];
+                        userLocation.city = cities[Math.floor(Math.random() * cities.length)];
+                        
+                        updateLocationDisplay();
+                    },
+                    function(error) {
+                        console.log('Location access denied or unavailable');
+                        userLocation.city = 'Your Area';
+                        updateLocationDisplay();
+                    }
+                );
+            } else {
+                userLocation.city = 'Your Area';
+                updateLocationDisplay();
+            }
+        }
+
+        // Update location display
+        function updateLocationDisplay() {
+            document.getElementById('locationText').textContent = `Events in ${userLocation.city}`;
+            document.getElementById('locationSubtext').textContent = `Discover what's happening around you`;
+        }
+
+        // Load and display events
+        function loadEvents() {
+            allEvents = [...sampleEvents];
+            filteredEvents = [...allEvents];
+            
+            // Hide loading and show events
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('eventsList').style.display = 'block';
+            
+            displayEvents(filteredEvents);
+            updateResultsCount();
+        }
+
+        // Display events
+        function displayEvents(events) {
+            const eventsList = document.getElementById('eventsList');
+            eventsList.innerHTML = '';
+
+            if (events.length === 0) {
+                eventsList.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-calendar-times" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                        <h4>No events found</h4>
+                        <p class="text-muted">Try adjusting your search filters or check back later.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            events.forEach(event => {
+                const eventCard = createEventCard(event);
+                eventsList.appendChild(eventCard);
+            });
+        }
+
+        // Create event card element
+        function createEventCard(event) {
+            const card = document.createElement('div');
+            card.className = 'event-card fade-in';
+            
+            const eventDate = new Date(event.date + 'T' + event.time);
+            const formattedDate = eventDate.toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+            const formattedTime = eventDate.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit' 
+            });
+
+            card.innerHTML = `
+                <div class="event-image">
+                    <div class="event-date-badge">${formattedDate}</div>
+                </div>
+                <div class="event-content">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="event-title">${event.title}</h5>
+                        <span class="event-price">${event.price}</span>
+                    </div>
+                    <div class="event-details">
+                        <div class="event-detail-item">
+                            <i class="fas fa-clock"></i>
+                            <span>${formattedTime}</span>
+                        </div>
+                        <div class="event-detail-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${event.location}</span>
+                        </div>
+                        <div class="event-detail-item">
+                            <i class="fas fa-route"></i>
+                            <span>${event.distance} away</span>
+                        </div>
+                        <div class="event-detail-item">
+                            <i class="fas fa-users"></i>
+                            <span>${event.attendees} attending</span>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-3">${event.description}</p>
+                    <div class="event-tags mb-3">
+                        ${event.tags.map(tag => `<span class="event-tag">${tag}</span>`).join('')}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn-interested" onclick="markInterested(${event.id})">
+                            <i class="fas fa-heart me-1"></i>Interested
+                        </button>
+                        <small class="text-muted">${getCategoryIcon(event.category)} ${event.category.charAt(0).toUpperCase() + event.category.slice(1)}</small>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Get category icon
+        function getCategoryIcon(category) {
+            const icons = {
+                music: '🎵',
+                sports: '⚽',
+                food: '🍕',
+                business: '💼',
+                arts: '🎨',
+                tech: '💻'
+            };
+            return icons[category] || '📅';
+        }
+
+        // Search events
+        function searchEvents() {
+            const query = document.getElementById('searchQuery').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const date = document.getElementById('dateFilter').value;
+
+            filteredEvents = allEvents.filter(event => {
+                const matchesQuery = !query || 
+                    event.title.toLowerCase().includes(query) ||
+                    event.description.toLowerCase().includes(query) ||
+                    event.location.toLowerCase().includes(query);
+                
+                const matchesCategory = !category || event.category === category;
+                
+                const matchesDate = !date || event.date === date;
+
+                return matchesQuery && matchesCategory && matchesDate;
+            });
+
+            displayEvents(filteredEvents);
+            updateResultsCount();
+        }
+
+        // Sort events
+        function sortEvents() {
+            const sortBy = document.getElementById('sortBy').value;
+            
+            filteredEvents.sort((a, b) => {
+                switch(sortBy) {
+                    case 'date':
+                        return new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time);
+                    case 'distance':
+                        return parseFloat(a.distance) - parseFloat(b.distance);
+                    case 'popularity':
+                        return b.attendees - a.attendees;
+                    case 'price':
+                        const priceA = a.price === 'Free' || a.price === 'Free Entry' ? 0 : parseFloat(a.price.replace('$', ''));
+                        const priceB = b.price === 'Free' || b.price === 'Free Entry' ? 0 : parseFloat(b.price.replace('$', ''));
+                        return priceA - priceB;
+                    default:
+                        return 0;
+                }
+            });
+
+            displayEvents(filteredEvents);
+        }
+
+        // Update results count
+        function updateResultsCount() {
+            const count = filteredEvents.length;
+            const total = allEvents.length;
+            document.getElementById('resultsCount').textContent = 
+                `Showing ${count} of ${total} events`;
+        }
+
+        // Mark event as interested
+        function markInterested(eventId) {
+            const button = event.target.closest('.btn-interested');
+            if (button.classList.contains('interested')) {
+                button.innerHTML = '<i class="fas fa-heart me-1"></i>Interested';
+                button.classList.remove('interested');
+                button.style.background = 'var(--primary-color)';
+            } else {
+                button.innerHTML = '<i class="fas fa-heart me-1" style="color: red;"></i>Going!';
+                button.classList.add('interested');
+                button.style.background = 'var(--success-color)';
+            }
+        }
+
+        // Account functions (placeholder implementations)
+        function showLogin() {
+            alert('Login functionality would be implemented here');
+        }
+
+        function showRegister() {
+            alert('Registration functionality would be implemented here');
+        }
+
+        function showProfile() {
+            alert('Profile page would be shown here');
+        }
+
+        function logout() {
+            alert('User logged out');
+            document.getElementById('profileLink').style.display = 'none';
+            document.getElementById('logoutLink').style.display = 'none';
+        }
+
+        // Set default date to today
+        document.getElementById('dateFilter').valueAsDate = new Date();
+
+        // Add event listeners for real-time search
+        document.getElementById('searchQuery').addEventListener('input', searchEvents);
+        document.getElementById('categoryFilter').addEventListener('change', searchEvents);
+        document.getElementById('dateFilter').addEventListener('change', searchEvents);
+    </script>
+</body>
+</html>

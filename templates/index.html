@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outdoor Events</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .location-status {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .location-status.loading {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+        }
+
+        .location-status.success {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+        }
+
+        .location-status.error {
+            background: linear-gradient(135deg, #e17055, #d63031);
+            color: white;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #fd79a8, #fdcb6e);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .events-section, .form-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .events-list {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .event-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .event-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .event-description {
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .event-distance {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        #map {
+            height: 300px;
+            border-radius: 15px;
+            border: 3px solid #e9ecef;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .map-instructions {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .coordinates-display {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            header, .events-section, .form-section {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏞️ Outdoor Events</h1>
+            <p class="subtitle">Discover and share amazing outdoor activities near you</p>
+        </header>
+
+        <div class="location-status" id="locationStatus">
+            <div class="spinner"></div>
+            Requesting your location...
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="refreshLocation">📍 Refresh Location</button>
+            <button class="btn btn-secondary" id="toggleForm">➕ Add New Event</button>
+        </div>
+
+        <div class="main-content">
+            <div class="events-section">
+                <h2 class="section-title">🎯 Events Near You</h2>
+                <div class="events-list" id="eventsList">
+                    <!-- Events will be populated here -->
+                </div>
+                <div class="text-center">
+                    <small class="text-muted">Events within 50km of your location</small>
+                </div>
+            </div>
+
+            <div class="form-section hidden" id="formSection">
+                <h2 class="section-title">📝 Add New Event</h2>
+                
+                <form id="eventForm">
+                    <div class="form-group">
+                        <div class="map-instructions">
+                            Click on the map to select event location
+                        </div>
+                        <div id="map"></div>
+                        <div class="coordinates-display" id="coordinatesDisplay">
+                            Click on the map to set coordinates
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventTitle">Event Title</label>
+                        <input type="text" class="form-control" id="eventTitle" 
+                               placeholder="e.g., Mountain Hiking Adventure" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventDescription">Event Description</label>
+                        <textarea class="form-control" id="eventDescription" 
+                                placeholder="Describe your outdoor event..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            🚀 Submit Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+
+    <script>
+        class OutdoorEventsApp {
+            constructor() {
+                this.userLocation = null;
+                this.map = null;
+                this.selectedMarker = null;
+                this.selectedCoordinates = null;
+                this.events = [];
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.requestLocation();
+                this.loadSampleEvents();
+            }
+
+            setupEventListeners() {
+                document.getElementById('refreshLocation').addEventListener('click', () => {
+                    this.requestLocation();
+                });
+
+                document.getElementById('toggleForm').addEventListener('click', () => {
+                    this.toggleForm();
+                });
+
+                document.getElementById('eventForm').addEventListener('submit', (e) => {
+                    this.handleFormSubmit(e);
+                });
+            }
+
+            requestLocation() {
+                const statusEl = document.getElementById('locationStatus');
+                statusEl.className = 'location-status loading';
+                statusEl.innerHTML = '<div class="spinner"></div> Requesting your location...';
+
+                if ('geolocation' in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => this.handleLocationSuccess(position),
+                        (error) => this.handleLocationError(error),
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+                    );
+                } else {
+                    this.handleLocationError({ message: 'Geolocation not supported' });
+                }
+            }
+
+            handleLocationSuccess(position) {
+                this.userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                const statusEl = document.getElementById('locationStatus');
+                statusEl.className = 'location-status success';
+                statusEl.innerHTML = `📍 Location found: ${this.userLocation.lat.toFixed(4)}, ${this.userLocation.lng.toFixed(4)}`;
+
+                this.filterAndDisplayEvents();
+            }
+
+            handleLocationError(error) {
+                console.error('Location error:', error);
+                const statusEl = document.getElementById('locationStatus');
+                statusEl.className = 'location-status error';
+                statusEl.innerHTML = '❌ Location access denied. Showing all events.';
+
+                this.displayAllEvents();
+            }
+
+            toggleForm() {
+                const formSection = document.getElementById('formSection');
+                const isHidden = formSection.classList.contains('hidden');
+                
+                if (isHidden) {
+                    formSection.classList.remove('hidden');
+                    this.initializeMap();
+                    document.getElementById('toggleForm').textContent = '❌ Cancel';
+                } else {
+                    formSection.classList.add('hidden');
+                    document.getElementById('toggleForm').textContent = '➕ Add New Event';
+                }
+            }
+
+            initializeMap() {
+                if (this.map) {
+                    this.map.remove();
+                }
+
+                const defaultLocation = this.userLocation || { lat: -1.2921, lng: 36.8219 }; // Nairobi default
+                
+                this.map = L.map('map').setView([defaultLocation.lat, defaultLocation.lng], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(this.map);
+
+                // Add user location marker if available
+                if (this.userLocation) {
+                    L.marker([this.userLocation.lat, this.userLocation.lng])
+                        .addTo(this.map)
+                        .bindPopup('📍 Your Location')
+                        .openPopup();
+                }
+
+                // Handle map clicks
+                this.map.on('click', (e) => {
+                    this.handleMapClick(e);
+                });
+            }
+
+            handleMapClick(e) {
+                const { lat, lng } = e.latlng;
+                
+                // Remove previous marker
+                if (this.selectedMarker) {
+                    this.map.removeLayer(this.selectedMarker);
+                }
+
+                // Add new marker
+                this.selectedMarker = L.marker([lat, lng], {
+                    icon: L.icon({
+                        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        className: 'selected-marker'
+                    })
+                }).addTo(this.map);
+
+                this.selectedCoordinates = { lat, lng };
+                
+                // Update coordinates display
+                document.getElementById('coordinatesDisplay').textContent = 
+                    `Selected: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            }
+
+            handleFormSubmit(e) {
+                e.preventDefault();
+
+                if (!this.selectedCoordinates) {
+                    alert('Please select a location on the map first!');
+                    return;
+                }
+
+                const title = document.getElementById('eventTitle').value;
+                const description = document.getElementById('eventDescription').value;
+
+                const eventData = {
+                    title,
+                    description,
+                    latitude: this.selectedCoordinates.lat,
+                    longitude: this.selectedCoordinates.lng,
+                    created_at: new Date().toISOString()
+                };
+
+                // Here you would normally send to Django backend
+                this.submitToBackend(eventData);
+            }
+
+            async submitToBackend(eventData) {
+                try {
+                    // Replace with your Django backend URL
+                    const response = await fetch('/api/events/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': this.getCSRFToken(),
+                        },
+                        body: JSON.stringify(eventData)
+                    });
+
+                    if (response.ok) {
+                        alert('🎉 Event created successfully!');
+                        this.resetForm();
+                        this.toggleForm();
+                        
+                        // Add to local events for demo
+                        this.events.push(eventData);
+                        this.filterAndDisplayEvents();
+                    } else {
+                        throw new Error('Failed to create event');
+                    }
+                } catch (error) {
+                    console.error('Submit error:', error);
+                    
+                    // For demo purposes, add to local storage
+                    this.events.push(eventData);
+                    this.filterAndDisplayEvents();
+                    alert('🎉 Event added locally (demo mode)!');
+                    this.resetForm();
+                    this.toggleForm();
+                }
+            }
+
+            getCSRFToken() {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    const [name, value] = cookie.trim().split('=');
+                    if (name === 'csrftoken') {
+                        return value;
+                    }
+                }
+                return '';
+            }
+
+            resetForm() {
+                document.getElementById('eventForm').reset();
+                document.getElementById('coordinatesDisplay').textContent = 'Click on the map to set coordinates';
+                
+                if (this.selectedMarker) {
+                    this.map.removeLayer(this.selectedMarker);
+                    this.selectedMarker = null;
+                }
+                
+                this.selectedCoordinates = null;
+            }
+
+            loadSampleEvents() {
+                // Sample events for demonstration
+                this.events = [
+                    {
+                        title: "Mountain Hiking Adventure",
+                        description: "Join us for a breathtaking hike through the beautiful mountain trails with stunning views.",
+                        latitude: -1.2500,
+                        longitude: 36.8000
+                    },
+                    {
+                        title: "Beach Volleyball Tournament",
+                        description: "Competitive beach volleyball tournament. All skill levels welcome!",
+                        latitude: -1.3500,
+                        longitude: 36.9000
+                    },
+                    {
+                        title: "Forest Nature Walk",
+                        description: "Peaceful nature walk through ancient forest paths. Perfect for bird watching.",
+                        latitude: -1.2000,
+                        longitude: 36.7500
+                    },
+                    {
+                        title: "Rock Climbing Session",
+                        description: "Beginner-friendly rock climbing with professional instructors and equipment provided.",
+                        latitude: -1.3000,
+                        longitude: 36.8500
+                    }
+                ];
+
+                this.displayAllEvents();
+            }
+
+            calculateDistance(lat1, lng1, lat2, lng2) {
+                const R = 6371; // Earth's radius in km
+                const dLat = this.toRad(lat2 - lat1);
+                const dLng = this.toRad(lng2 - lng1);
+                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(this.toRad(lat1)) * Math.cos(this.toRad(lat2)) *
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                return R * c;
+            }
+
+            toRad(deg) {
+                return deg * (Math.PI / 180);
+            }
+
+            filterAndDisplayEvents() {
+                if (!this.userLocation) {
+                    this.displayAllEvents();
+                    return;
+                }
+
+                const nearbyEvents = this.events
+                    .map(event => ({
+                        ...event,
+                        distance: this.calculateDistance(
+                            this.userLocation.lat,
+                            this.userLocation.lng,
+                            event.latitude,
+                            event.longitude
+                        )
+                    }))
+                    .filter(event => event.distance <= 50) // 50km radius
+                    .sort((a, b) => a.distance - b.distance);
+
+                this.displayEvents(nearbyEvents);
+            }
+
+            displayAllEvents() {
+                const eventsWithDistance = this.events.map(event => ({
+                    ...event,
+                    distance: this.userLocation ? 
+                        this.calculateDistance(
+                            this.userLocation.lat,
+                            this.userLocation.lng,
+                            event.latitude,
+                            event.longitude
+                        ) : null
+                }));
+
+                this.displayEvents(eventsWithDistance);
+            }
+
+            displayEvents(events) {
+                const eventsListEl = document.getElementById('eventsList');
+                
+                if (events.length === 0) {
+                    eventsListEl.innerHTML = `
+                        <div class="text-center" style="padding: 40px;">
+                            <h3>🔍 No events found nearby</h3>
+                            <p>Be the first to add an outdoor event in your area!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                eventsListEl.innerHTML = events.map(event => `
+                    <div class="event-card">
+                        <div class="event-title">${event.title}</div>
+                        <div class="event-description">${event.description}</div>
+                        <div class="event-distance">
+                            ${event.distance ? `📍 ${event.distance.toFixed(1)} km away` : '📍 Location unknown'}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new OutdoorEventsApp();
+        });
+    </script>
+</body>
+</html>
