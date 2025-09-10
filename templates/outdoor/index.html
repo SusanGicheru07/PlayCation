@@ -379,7 +379,7 @@ textarea.form-control {
             <h2 class="section-title">🎯 Events Near You</h2>
             
             <div class="controls mb-20">
-                <button class="btn btn-primary" id="showNearby">📍 Show Nearby (50km)</button>
+                <button class="btn btn-primary" id="showNearby">📍 Show Nearby (35km)</button>
                 <button class="btn btn-secondary" id="showAll">🌍 Show All Events</button>
             </div>
             
@@ -600,7 +600,7 @@ textarea.form-control {
                             event.longitude
                         )
                     }))
-                    .filter(event => event.distance <= 50) // 50km radius
+                    .filter(event => event.distance <= 35) // 50km radius
                     .sort((a, b) => a.distance - b.distance);
 
                 this.renderEvents(nearbyEvents, 'nearby');
@@ -634,9 +634,9 @@ textarea.form-control {
                         <div class="text-center" style="padding: 40px;">
                             <h3>🔍 No events found ${type === 'nearby' ? 'nearby' : ''}</h3>
                             <p>${type === 'nearby' ? 
-                                'No events within 50km of your location.' : 
+                                'No events within 35km of your location.' : 
                                 'No events available at the moment.'}</p>
-                            <a href="add-event.html" class="btn btn-secondary mt-20">
+                            <a href="/new-event/" class="btn btn-secondary mt-20">
                                 ➕ Be the first to add an event!
                             </a>
                         </div>
@@ -669,7 +669,7 @@ textarea.form-control {
 
                 // Update count display
                 const countText = type === 'nearby' ? 
-                    `${events.length} event(s) within 50km of your location` :
+                    `${events.length} event(s) within 35km of your location` :
                     `${events.length} total event(s) available`;
                 eventsCountEl.textContent = countText;
             }

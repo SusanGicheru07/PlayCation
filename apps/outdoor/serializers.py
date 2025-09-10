@@ -1,10 +1,8 @@
 from rest_framework import serializers
+from apps.outdoor.models import OutdoorActivity
 
 
-class NewEventSerializer(serializers.Serializer):
-    title = serializers.CharField(max_length=255)
-    description = serializers.CharField()
-    category = serializers.CharField(max_length=100)
-    latitude = serializers.FloatField()
-    longitude = serializers.FloatField()
-    created_at = serializers.DateTimeField()
+class NewEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OutdoorActivity
+        fields = "__all__"
