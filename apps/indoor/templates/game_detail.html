@@ -1,0 +1,127 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayCation</title>
+
+     <!--import lecend font -->
+     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+     <!--import css -->
+     <link rel="stylesheet" href="{% static 'indoor/css/main.css' %}">
+
+    <style>
+        body{
+            margin:0;
+            padding: 2px;
+            background: #f8f9fa;
+            width: 100vw;
+            height: 100vh;
+            display: flex; 
+            align-items: center;
+            font-family: 'Lexend', sans-serif;
+            flex-direction: row;
+        }
+        main{
+            display: flex;
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+            background: transparent;
+            overflow: hidden;
+            flex-direction:column;
+            margin-left: 20px;
+            margin-top: 2rem;
+        }
+        .page-content{
+            margin-top: 4rem;
+        }
+        button{
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            width: 150px;
+            height: 40px;
+        }
+    </style>
+</head>
+<body>
+    {% block content %}
+        {% include 'sidebar.html' %}
+
+        <main>
+            <section>
+                <div class="page-describ">
+                    <button onclick="window.history.back()" class="back-btn">⬅ Back</button>
+                    <h1>Games: </h1>
+                    <p>Wanna have some fun? Check out the game description and when satisfied START A ROUND !!!!</p>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="description">
+                    <h2>Game Name: {{ game.type }}</h2>
+
+                    {% if game.type == "Charades" or game.type == "charades" %}
+                        <h3>What is {{game.type}}</h3>
+                        <p>Charades is a fun and interactive guessing game where one team member silently acts out a word or phrase 
+                            while the rest of the team tries to guess what it is. The goal is to guess as many correct answers as 
+                            possible before time runs out. It’s a perfect game for building teamwork, quick thinking, and communication 
+                            skills. </p>
+
+                        <h3>How to Play:</h3>
+                        <ol>
+                            <li><strong>Form Teams:</strong> Players are divided into two or more teams.</li>
+                            <li><strong>Start a Round:</strong> One team selects a player to act out the clue generated in the game.</li>
+                            <li><strong>Act Without Speaking:</strong> The player must act out the word or phrase without talking or making sounds.</li>
+                            <li><strong>Guessing:</strong> Teammates must guess the correct answer before time runs out.</li>
+                            <li><strong>Scoring:</strong> A correct guess earns <strong>20 points</strong> for that round.</li>
+                            <li><strong>Winning:</strong> The team with the highest points after all rounds wins.</li>
+                        </ol>
+                
+                        <h3>What to Do Here:</h3>
+                        <ul>
+                            <li>Click <strong>"Add Round"</strong> to create a new round with a hint for the acting player.</li>
+                            <li>After acting, select the team that guessed correctly to declare the winner.</li>
+                            <li>The system will automatically update the leaderboard with new scores.</li>
+                        </ul>
+
+                    {% elif game.type == "Singing" or game.type == "singing" %}
+                        <h2>Singing Challenge</h2>
+                        <p><strong>What is the Singing Challenge?</strong><br>
+                        The Singing Challenge is a fun and competitive game where teams compete by singing songs. 
+                        The system automatically analyzes each performance based on <em>duration</em>, <em>loudness</em>, 
+                        and <em>pitch</em> to assign points fairly.</p>
+
+                        <h3>How to Play:</h3>
+                        <ol>
+                            <li><strong>Form Teams:</strong> Teams take turns to record their singing performance.</li>
+                            <li><strong>Upload Audio:</strong> Use the upload button to submit your team's singing audio.</li>
+                            <li><strong>Automatic Scoring:</strong> The system will evaluate the performance and assign points.</li>
+                            <li><strong>Winning:</strong> The team with the highest total points after all rounds wins.</li>
+                        </ol>
+
+                        <h3>What to Do Here:</h3>
+                        <ul>
+                            <li>Click <strong>"Add Round"</strong> to start a new singing challenge round.</li>
+                            <li>Upload the recorded audio for evaluation.</li>
+                            <li>View the automatic scoring results and check the leaderboard.</li>
+                        </ul>
+                    {% endif %}
+    
+                    <a href="{% url 'add_round' game.id %}" class="join-button">Start Game</a>
+                </div>
+            </section>
+
+        </main>
+            
+    {% endblock %}
+  
+</body>
+</html>

@@ -9,3 +9,5 @@ librosa
 soundfile
 numpy
 
+channels==4.3.1
+
