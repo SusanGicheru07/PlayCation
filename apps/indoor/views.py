@@ -125,3 +125,6 @@ def scoreboard(request):
     """Show all teams ranked by score."""
     teams = Team.objects.order_by("-score")
     return render(request, "templates/scoreboard.html", {"teams": teams})
+
+# whiteboard feature
+#like a hint for people to act it out the phrase given
