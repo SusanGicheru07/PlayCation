@@ -16,20 +16,20 @@ import subprocess
 def home(request):
     """Show available games (Singing, Charades)."""
     games = Game.objects.filter(active_status=True)
-    return render(request, "index.html", {"games": games})
+    return render(request, "indoor/index.html", {"games": games})
 
 
 def team_list(request):
     """List all teams with scores."""
     teams = Team.objects.all()
-    return render(request, "teams.html", {"teams": teams})
+    return render(request, "indoor/teams.html", {"teams": teams})
 
 
 def start_game(request, game_id):
     """Start a game by selecting it and showing details."""
     game = get_object_or_404(Game, id=game_id)
     rounds = Round.objects.filter(game=game).order_by("round_number")
-    return render(request, "game_detail.html", {"game": game, "rounds": rounds})
+    return render(request, "indoor/game_detail.html", {"game": game, "rounds": rounds})
 
 
 def add_round(request, game_id):
@@ -72,7 +72,7 @@ def add_round(request, game_id):
             # Redirect to singing interface
             return redirect("singing_round", round_id=Round.objects.filter(game=game).last().id)
     
-    return render(request, "add_round.html", {"game": game, "teams":teams})
+    return render(request, "indoor/add_round.html", {"game": game, "teams":teams})
 
 
 def singing_round(request, round_id):
@@ -88,7 +88,7 @@ def singing_round(request, round_id):
         'song_title': round_instance.hint  
     }
     
-    return render(request, 'singing_round.html', context)
+    return render(request, 'indoor/singing_round.html', context)
 
 
 def singing_upload(request, round_id, team_id):
@@ -158,7 +158,7 @@ def handle_guesses(request, round_id):
                 "message": f"Not enough correct guesses ({correct_guesses}/3)"
             })
     
-    return render(request, "guessing_interface.html", {"round": round_instance, "game":game})
+    return render(request, "indoor/guessing_interface.html", {"round": round_instance, "game":game})
 
 def declare_winner(request, round_id, team_id):
     """Fallback for Charades game."""
@@ -187,4 +187,4 @@ def declare_winner(request, round_id, team_id):
 def scoreboard(request):
     """Show all teams ranked by score."""
     teams = Team.objects.order_by("-score")
-    return render(request, "scoreboard.html", {"teams": teams})
+    return render(request, "indoor/scoreboard.html", {"teams": teams})
