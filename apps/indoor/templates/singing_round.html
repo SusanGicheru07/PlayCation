@@ -553,7 +553,7 @@
         <h2>🎯 Choose Your Team</h2>
         <div class="team-buttons">
             {% for team in teams %}
-            <button class="team-btn" onclick="selectTeam('{{ team.id }}', '{{ team.name }}')">
+            <button class="team-btn" onclick="selectTeam({{ team.id }}, '{{ team.name }}', event)">
                 {{ team.name }}
             </button>
             {% endfor %}
@@ -636,7 +636,7 @@
     /**
      * Select a team to perform
      */
-    function selectTeam(teamId, teamName) {
+    function selectTeam(teamId, teamName, event) {
         selectedTeamId = teamId;
         selectedTeamName = teamName;
 
@@ -674,7 +674,8 @@
 
                 mediaRecorder.addEventListener("stop", () => {
                     stream.getTracks().forEach(track => track.stop());
-                    recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    console.log("Recording stopped. Blob ready:", recordedBlob);
                     submitAudioForScoring();
                 });
 
@@ -734,42 +735,65 @@
     }
 
     /**
-     * Submit recorded audio to backend for automatic scoring
-     */
+    * Generate random score and send it to the backend
+    */
     function submitAudioForScoring() {
-        const formData = new FormData();
-        formData.append("audio", recordedBlob, 'recording.wav');
-
+        // Generate random points between 50 and 100
+        const totalPoints = Math.floor(Math.random() * 51) + 50;
+    
+        // Breakdown for UI purposes
+        const breakdown = {
+            duration: Math.floor(Math.random() * 20) + 10,    // fake effort
+            enthusiasm: Math.floor(Math.random() * 20) + 10,  // fake enthusiasm
+            creativity: Math.floor(Math.random() * 20) + 10   // fake creativity
+        };
+    
+        // Show popup immediately
+        alert(`🎉 ${selectedTeamName} earned ${totalPoints} points!`);
+    
+        // Show a loading message while "processing"
+        document.getElementById('recordingArea').classList.remove('active');
+        document.getElementById('results').classList.remove('active');
+    
         const csrfToken = getCookie('csrftoken');
-        if (csrfToken) {
-            formData.append('csrfmiddlewaretoken', csrfToken);
-        }
-
-        fetch(`/indoor/singing/${gameData.roundId}/${selectedTeamId}/`, {
-            method: "POST",
-            body: formData,
-            headers: { 'X-CSRFToken': csrfToken }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to process recording');
-            return response.json();
-        })
-        .then(data => {
-            if (data.error) {
-                showError(data.error);
-            } else {
-                displayFinalResults(data);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showError("Error submitting recording. Please try again!");
-        });
+    
+        // Simulate a delay before showing results
+        setTimeout(() => {
+            // Send points to backend
+            fetch(`/indoor/singing/${gameData.roundId}/${selectedTeamId}/`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    team: selectedTeamId,
+                    points: totalPoints
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`Backend error: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(() => {
+                // Display results after delay
+                displayFinalResults({
+                    points: totalPoints,
+                    breakdown: breakdown,
+                    team: selectedTeamName
+                });
+            })
+            .catch(error => {
+                console.error("Error submitting points:", error);
+                showError("Failed to submit points to the backend.");
+            });
+        }, 10000); // <-- 10-second delay
     }
-
-    /**
-     * Display final results after backend scoring
-     */
+    
     function displayFinalResults(data) {
         document.getElementById('recordingArea').classList.remove('active');
 
@@ -779,15 +803,11 @@
         document.getElementById('finalEnthusiasmScore').textContent = data.breakdown.enthusiasm;
         document.getElementById('finalCreativityScore').textContent = data.breakdown.creativity;
 
-        // Performance details
+        // Hide performance details since it's fake now
         document.getElementById('performanceDetails').innerHTML = `
-            <strong>${data.team}</strong> performed for 
-            <strong>${data.duration_sec.toFixed(1)} seconds</strong><br>
-            Avg Pitch: ${data.avg_pitch.toFixed(2)} Hz<br>
-            Loudness: ${data.loudness.toFixed(2)} dBFS
+            <strong>${data.team}</strong> gave an amazing performance! 🎤
         `;
 
-        // Show results
         document.getElementById('results').classList.add('active');
     }
 
