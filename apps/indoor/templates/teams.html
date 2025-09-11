@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayCation</title>
+
+    <!--import lecend font -->
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!--import css -->
+    <link rel="stylesheet" href="{% static 'indoor/css/main.css' %}">
+
+    <style>
+        body{
+            margin:0;
+            padding: 2px;
+            background: #f8f9fa;
+            width: 100vw;
+            height: 100vh;
+            display: flex; 
+            align-items: center;
+            font-family: 'Lexend', sans-serif;
+            flex-direction: row;
+        }
+        main{
+            display: flex;
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+            margin-left: 20px;
+            background: transparent;
+            overflow: hidden;
+            flex-direction:column;
+            margin-top: 2rem;
+        }
+        button{
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            width: 150px;
+            height: 40px;
+        }
+        .teams-card{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .team-card{
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+        {% block content %}
+
+         {% include 'sidebar.html' %}
+
+         <main>
+         <section>
+            <div class="page-describ">
+                <button onclick="window.history.back()" class="back-btn">⬅ Back</button>
+                <h1>Team: </h1>
+                <p>Feel free to join any team and get ready to start a playful session</p>
+            </div>
+            <div class="teams-card">
+                {% for team in teams %}
+                    <div class="team-card">
+                        <h2>Team Name: {{ team.name }}</h2>
+                        <p>Score: {{ team.score }}</p>
+                        <ul>
+                           <li>
+                            Members: {{ team.members }}
+                           </li>
+                        </ul>
+                        <a href="" class="join-button">Join Team</a>
+                    </div>
+                {% empty %}
+                    <p>No teams available at the moment. Please check back later.</p>
+                {% endfor %}
+            </div>
+         </section>
+
+         
+
+    </main>
+
+        {% endblock %}
+    
+ 
+        <script>
+            document.getElementById('back-button').addEventListener('click', function() {
+                
+            });
+        </script>
+</body>
+</html>

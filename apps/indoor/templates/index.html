@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayCation</title>
+
+    <!--import lecend font -->
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body{
+            margin:0;
+            padding: 2px;
+            background: #000000;
+            width: 100vw;
+            height: 100vh;
+            display: flex; 
+            align-items: center;
+            font-family: 'Lexend', sans-serif;
+        }
+
+        .main{
+            background-image: url('https://media.istockphoto.com/id/2186585249/photo/gamer-work-space-concept-top-view-a-gaming-gear-mouse-keyboard-joystick-headset-mobile.jpg?s=612x612&w=0&k=20&c=T55vDUdRFbrv6K_rSs97OfcTdqmI946klCpZOCrJ5vA=');
+            padding: 20px;
+            background-repeat: no-repeat;
+            background-size: cover;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: -10px;
+            height: 90vh;
+            width: 90vw;
+            margin-left: 65px;
+                    
+        }
+        .description{
+            display: flex;
+            padding: 20px;
+            padding-top: 30px;
+            padding-bottom: 40px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: aliceblue;
+            text-align: center;
+            margin-left: 80px; 
+            margin-bottom:20px;
+            width: 80vw;
+            height: max-content;
+            backdrop-filter: blur(33px);
+            background-blend-mode:saturation;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+            border-radius: 20px;
+        }
+        ul{
+            list-style: none;
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            color: whitesmoke;
+            justify-content: center;
+            align-items: center;
+        }
+        .arrow{
+            background-image: url('https://cdn1.iconfinder.com/data/icons/hand-drawn-marker/512/line_arrow33-128.png');
+        }
+        .description p {    
+            text-align: center;  
+            margin: 0 auto;     
+            font-size: 18px;
+            line-height: 1.6;   
+            width: 80vw;
+            align-items: start;
+
+        }
+        h1{
+            font-size: 70px;
+            margin-bottom: 0;
+            color: white;
+        }
+        .main-content{
+            margin-top: 10rem;
+            text-align:center;
+            justify-content: center;
+            align-items:center;
+        }
+        ul li a{
+            color: aliceblue;
+        }
+        .arrow {
+            position: relative;
+            bottom: 1rem;
+            left: 50%;
+            margin-left:-20px;
+            width: 40px;
+            height: 40px;
+            margin-top: 70px;
+
+            /**
+            * Dark Arrow Down
+            */
+            background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8IS0tIExpY2Vuc2U6IFBELiBNYWRlIGJ5IExheWxhUmVuOiBodHRwczovL2RyaWJiYmxlLmNvbS9MYXlsYVJlbiAtLT4KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik04IDE2QzEyLjQxODMgMTYgMTYgMTIuNDE4MyAxNiA4QzE2IDMuNTgxNzIgMTIuNDE4MyAwIDggMEMzLjU4MTcyIDAgMCAzLjU4MTcyIDAgOEMwIDEyLjQxODMgMy41ODE3MiAxNiA4IDE2Wk0xMiA4SDlWM0g3VjhINFY5TDggMTNMMTIgOVY4WiIgZmlsbD0iIzAzMDcwOCIgZmlsbC1ydWxlPSJldmVub2RkIi8+PC9zdmc+);
+            background-size: contain;
+            
+        }
+
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+
+            @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-30px);
+            }
+            60% {
+                transform: translateY(-15px);
+            }
+            }
+            .game-section {
+                margin: 50px auto;
+                max-width: 1200px;
+                text-align: center;
+            }
+
+            .section-title {
+                font-size: 2rem;
+                margin-bottom: 20px;
+                color: #fff;
+            }
+
+            .game-card {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 15px;
+                padding: 20px;
+                text-align: center;
+                color: #fff;
+                backdrop-filter: blur(10px);
+                transition: transform 0.3s ease;
+                width: 15vw;
+                height: 15vh;
+            
+            }
+            .swiper-wrapper{
+                display: flex;
+                flex-direction: row;
+                gap: 20px;
+            }
+            .swiper{
+                margin-bottom:10px;
+            }
+            
+            .game-cards h2{
+                font-size: 1.3rem;
+                color: #38a3a5;
+            }
+
+            .game-card:hover {
+                transform: translateY(-8px);
+            }
+
+            .play-btn {
+                display: inline-block;
+                margin-top: 15px;
+                padding: 10px 20px;
+                background: linear-gradient(90deg, #3b82f6, #6ee7b7);
+                color: white;
+                font-weight: 600;
+                border-radius: 10px;
+                text-decoration: none;
+                transition: background 0.3s ease;
+            }
+
+            .play-btn:hover {
+                background: linear-gradient(90deg, #6ee7b7, #3b82f6);
+            }
+            button{
+                    padding: 10px;
+                    border-radius: 5px;
+                    border: none;
+                    background-color: #007bff;
+                    color: white;
+                    font-size: 16px;
+                    cursor: pointer;
+                    width: 150px;
+                    height: 40px;
+                }
+                .cont{
+                    font-size: 20px;
+                    color: white;
+                    margin-bottom: 10px;
+                    text-align: center;
+                    justify-content: end;
+                    align-items: end;
+                    
+                }
+    </style>
+</head>
+<body>
+    {% block content %}
+    
+    <div class="main">
+        <div class="main-content">
+            <h1>Welcome to PlayCation</h1>
+            <div class="description">
+                <p>Welcome to PlayCation — a calm getaway designed for developers. 
+                    Here, code takes a backseat and creativity takes the lead. 
+                    We know the long hours, constant screen time, and mental strain 
+                    that come with building amazing things, which is why PlayCation exists: 
+                    to give you a space to rest, recharge, and simply enjoy yourself. 
+                    Step into a world of lighthearted games, playful challenges, and community-driven 
+                    fun where the goal isn’t deadlines or deliverables, but laughter, relaxation, and renewed energy. 
+                    This is your reminder that taking a break is part of the process — and that even the best developers need time to play.</p>
+
+                <p>Lets have some fun:</p>
+
+                
+                <div class="game-cards">
+                    <div class="arrow bounce"></div>
+                    <h2>Available games</h2>
+                        <!-- Swiper container -->
+                        <div class="swiper mySwiper">
+                            <div class="swiper-wrapper">
+                                {% for game in games %}
+                                <div class="swiper-slide">
+                                    <div class="game-card">
+                                    <h3>{{ game.type }}</h3>
+                                    <p>{{ game.description }}</p>
+                                    <a href="{% url 'start_game' game.id%}" class="play-btn">Play Now</a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Navigation buttons -->
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+
+                            <!-- Pagination (dots) -->
+                            <div class="swiper-pagination"></div>
+                        </div>
+                    </div>
+                <p class="cont">Check out some exciting <a href="../../outdoor/"><button>Outdoor activities</button></a> </p>
+                
+    
+            </div>
+            
+                <ul>
+                    <li><a href="{% url 'home' %}">Available Games</a></li>
+                    <li><a href="{% url 'home' %}">Login</a></li>
+                    <li><a href="{% url 'home' %}">Register</a></li>
+                </ul>
+                
+        </div>
+        
+    </div>
+
+    {% endblock %}
+</body>
+</html>

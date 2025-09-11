@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayCation</title>
+
+    <!--import lexend font -->
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+     <!--import css -->
+     <link rel="stylesheet" href="../static/indoor/css/main.css">
+
+    <style>
+        body{
+            margin:0;
+            padding: 2px;
+            background: #f8f9fa;
+            width: 100vw;
+            height: 100vh;
+            display: flex; 
+            align-items: center;
+            font-family: 'Lexend', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        {% block content %}
+
+         {% include 'sidebar.html' %}
+
+         {% include 'teams.html'%}
+
+        {% endblock %}
+    </main>
+ 
+</body>
+</html>

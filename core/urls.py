@@ -7,8 +7,7 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('indoor/', include('apps.indoor.urls')),
-    path('', include('apps.outdoor.urls')),     # include your outdoor app   
-
+    path('', include('apps.outdoor.urls'))
 ]
 
 
