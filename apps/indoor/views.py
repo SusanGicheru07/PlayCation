@@ -1,13 +1,16 @@
 import os
 import tempfile
+import json
 from django.shortcuts import render, get_object_or_404, redirect
+from .utils import calculate_singing_points
 from django.http import JsonResponse
 from django.db.models import F
 from .models import Team, Game, Round
 from pydub import AudioSegment
 import numpy as np
 import librosa
-
+import soundfile as sf
+import subprocess
 
 
 def home(request):
@@ -82,112 +85,38 @@ def singing_round(request, round_id):
         'round': round_instance,
         'teams': teams,
         'game': game,
-        'song_title': round_instance.hint  # Using hint field for song title
+        'song_title': round_instance.hint  
     }
     
     return render(request, 'singing_round.html', context)
 
 
 def singing_upload(request, round_id, team_id):
-    
     """
-    Handle singing audio:
-    - Measure duration, loudness, and pitch.
-    - Assign points automatically based on effort and creativity.
+    Fake scoring endpoint — only receives points from the frontend
     """
-    if request.method == "POST" and request.FILES.get("audio"):
-        audio_file = request.FILES["audio"]
-        
+    if request.method == "POST":
+        data = json.loads(request.body.decode("utf-8"))
+        points = data.get("points")
+
+        if points is None:
+            return JsonResponse({"error": "Points not provided"}, status=400)
+
         round_instance = get_object_or_404(Round, id=round_id)
         team = get_object_or_404(Team, id=team_id)
-        
-        # Save file temporarily
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-            for chunk in audio_file.chunks():
-                tmp.write(chunk)
-            tmp_path = tmp.name
-        
-        try:
-            # Load audio with pydub
-            audio = AudioSegment.from_file(tmp_path)
-            
-            # Duration (in seconds)
-            duration_sec = len(audio) / 1000.0
-            
-            # Loudness (RMS in dB)
-            loudness = audio.dBFS  # average loudness
-            
-            # librosa for pitch estimation
-            y, sr = librosa.load(tmp_path)
-            pitches, magnitudes = librosa.piptrack(y=y, sr=sr)
-            pitch_values = pitches[magnitudes > np.median(magnitudes)]
-            avg_pitch = np.mean(pitch_values) if len(pitch_values) > 0 else 0
-            
-            # Calculate pitch variance for creativity scoring
-            pitch_variance = np.var(pitch_values) if len(pitch_values) > 0 else 0
-            
-            # ---------------- EFFORT & CREATIVITY SCORING ----------------
-            # 1. Duration points (effort) - max 40 points
-            if duration_sec >= 60:  # 1+ minute = excellent effort
-                duration_points = 40
-            elif duration_sec >= 30:  # 30+ seconds = good effort
-                duration_points = int(20 + (duration_sec - 30) / 30 * 20)
-            elif duration_sec >= 10:  # 10+ seconds = some effort
-                duration_points = int(10 + (duration_sec - 10) / 20 * 10)
-            else:  # Less than 10 seconds = minimal effort
-                duration_points = max(5, int(duration_sec))
-            
-            # 2. Volume points (enthusiasm/effort) - max 30 points
-            if loudness > -20:  # Very enthusiastic
-                loudness_points = 30
-            elif loudness > -40:  # Moderate enthusiasm
-                loudness_points = int(15 + (loudness + 40) / 20 * 15)
-            elif loudness > -60:  # Quiet but trying
-                loudness_points = int(5 + (loudness + 60) / 20 * 10)
-            else:  # Very quiet
-                loudness_points = 5
-            
-            # 3. Creativity points (pitch variation) - max 30 points
-            if pitch_variance > 5000:  # High creativity
-                creativity_points = 30
-            elif pitch_variance > 1000:  # Some creativity
-                creativity_points = int(10 + (min(pitch_variance, 5000) - 1000) / 4000 * 20)
-            else:  # Limited creativity
-                creativity_points = max(5, int(pitch_variance / 200))
-            
-            total_points = duration_points + loudness_points + creativity_points
-            
-            # Update round and team scores
-            round_instance.winner = team
-            round_instance.points = total_points
-            round_instance.save()
-            
-            Team.objects.filter(id=team.id).update(score=F("score") + total_points)
-            
-            # Cleanup temp file
-            os.remove(tmp_path)
-            
-            return JsonResponse({
-                "team": team.name,
-                "duration_sec": duration_sec,
-                "loudness": loudness,
-                "avg_pitch": avg_pitch,
-                "pitch_variance": pitch_variance,
-                "points": total_points,
-                "breakdown": {
-                    "duration": duration_points,
-                    "enthusiasm": loudness_points,
-                    "creativity": creativity_points
-                }
-            })
-            
-        except Exception as e:
-            # Cleanup temp file on error
-            if os.path.exists(tmp_path):
-                os.remove(tmp_path)
-            return JsonResponse({"error": f"Audio processing failed: {str(e)}"}, status=500)
-    
-    return JsonResponse({"error": "No audio received"}, status=400)
+
+        # Add points to team
+        team.score += points
+        team.save()
+
+        return JsonResponse({
+            "message": f"Points added to {team.name}",
+            "team": team.name,
+            "points_awarded": points,
+            "total_score": team.score
+        })
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
 
 def handle_guesses(request, round_id):
     round_instance = get_object_or_404(Round, id=round_id)

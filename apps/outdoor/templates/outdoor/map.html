@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Outdoor Activities Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="{% static 'outdoor/stylesheet.css' %}">
+</head>
+<body>
+  <div id="map"></div>
+  <div id="sidebar">
+    <h2>Activities</h2>
+    <ul id="activityList"></ul>
+
+    <h3>Add Activity</h3>
+    <form id="activityForm">
+      <input type="text" name="name" placeholder="Name" required><br>
+      <select name="activity">
+        <option value="hike">Hike Trail</option>
+        <option value="camping">Camping</option>
+        <option value="picnic">Picnic Area</option>
+        <option value="other">Other</option>
+      </select><br>
+      <textarea name="notes" placeholder="Notes"></textarea><br>
+      <input type="hidden" name="lat" id="lat">
+      <input type="hidden" name="lng" id="lng">
+      <button type="submit">Save</button>
+    </form>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+  const map = L.map('map').setView([-1.28, 36.82], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+  const activitiesLayer = L.layerGroup().addTo(map);
+  const activityList = document.getElementById("activityList");
+
+  function addMarker(act) {
+    const m = L.circleMarker([act.lat, act.lng], {radius:6, color:"blue", fillOpacity:0.8})
+      .bindPopup(`<b>${act.name}</b><br>${act.activity}<br>${act.location}<br>${act.notes||""}`);
+    m.addTo(activitiesLayer);
+
+    const li = document.createElement("li");
+    li.textContent = `${act.name} (${act.activity})`;
+    li.onclick = () => { map.setView([act.lat, act.lng], 15); m.openPopup(); };
+    activityList.appendChild(li);
+  }
+
+  async function loadActivities() {
+    const res = await fetch("/api/activities/");
+    const data = await res.json();
+    data.forEach(addMarker);
+  }
+  loadActivities();
+
+  map.on("click", (e) => {
+    document.getElementById("lat").value = e.latlng.lat;
+    document.getElementById("lng").value = e.latlng.lng;
+    alert("Point selected, fill form and save!");
+  });
+
+  document.getElementById("activityForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const res = await fetch("/add/activity/", {
+      method: "POST",
+      headers: {"X-CSRFToken": getCookie("csrftoken")},
+      body: formData
+    });
+    if (res.ok) {
+      const act = await res.json();
+      addMarker(act);
+      e.target.reset();
+      alert("Saved!");
+    }
+  };
+
+  function getCookie(name) {
+    const cookies = document.cookie.split(';');
+    for (let c of cookies) {
+      const cookie = c.trim();
+      if (cookie.startsWith(name + '=')) return decodeURIComponent(cookie.split('=')[1]);
+    }
+    return null;
+  }
+  </script>
+</body>
+</html>
