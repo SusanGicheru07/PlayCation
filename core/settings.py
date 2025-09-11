@@ -1,5 +1,6 @@
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,6 +15,8 @@ ALLOWED_HOSTS = ["*"] #config("ALLOWED_HOSTS", default="").split(",")
 # Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
 
 
 # Application definition
@@ -31,7 +34,23 @@ INSTALLED_APPS = [
     # Apps
     'apps.outdoor',
     'apps.indoor',
+
+    #channels
+    'channels',
 ]
+
+#channel routing
+ASGI_APPLICATION = "playcation.routing.application"
+
+CHANNEL_LAYERS = {
+  "default": {
+    "BACKEND": "channels_redis.core.RedisChannelLayer",
+    "CONFIG": {
+      "hosts": [("127.0.0.1", 6379)],
+    },
+  },
+}
+#end of channel routing
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -52,6 +71,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -61,7 +81,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

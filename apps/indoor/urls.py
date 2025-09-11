@@ -6,6 +6,8 @@ urlpatterns = [
     path('teams/', views.team_list, name='team_list'),
     path('game/<int:game_id>/', views.start_game, name='start_game'),
     path('game/<int:game_id>/add-round/', views.add_round, name='add_round'),
+    path('singing_round/<int:round_id>/', views.singing_round, name='singing_round'),
+    path('round/<int:round_id>/guesses/', views.handle_guesses, name='handle_guesses'),
     path('round/<int:round_id>/declare-winner/<int:team_id>/', views.declare_winner, name='declare_winner'),
     path('scoreboard/', views.scoreboard, name='scoreboard'),
 

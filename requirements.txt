@@ -8,3 +8,5 @@ librosa
 soundfile
 numpy
 gunicorn
+channels==4.3.1
+

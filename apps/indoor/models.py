@@ -64,12 +64,27 @@ class Round(models.Model):
         max_length=255,
         help_text="Hint for the round (e.g., word for charades)."
     )
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.CASCADE,
+        related_name='rounds',
+        help_text="The team participating in this round.",
+        default=None
+    )
+    content_type = models.CharField(
+        max_length=50,
+        choices=[('charades', 'Charades'), ('singing', 'Singing')],
+        help_text="Type of content for this round.",
+        default=''
+    )
     winner = models.ForeignKey(
         Team,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text="The team that won this round (if any)."
+        related_name='won_rounds',
+        help_text="The team that won this round (if any).",
+        default=None
     )
     points = models.IntegerField(
         default=0,
