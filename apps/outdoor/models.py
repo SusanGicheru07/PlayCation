@@ -37,4 +37,3 @@ class OutdoorActivity(models.Model):
         ordering = ['name']
         constraints = [
             models.UniqueConstraint(fields=['name', 'activity'], name='unique_activity_per_name')
-        ]
