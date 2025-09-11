@@ -1,71 +1,59 @@
+from django.http import HttpRequest
 from django.shortcuts import render
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from .models import OutdoorLocation, OutdoorActivity
-import math
+
+from typing import Dict, Any
+
+from rest_framework.response import Response
+from rest_framework import status, generics
+from rest_framework.request import Request
+
+from apps.outdoor.serializers import NewEventSerializer
+from apps.outdoor.models import OutdoorActivity
+
+# Create your views here.
+def index(request: HttpRequest):
+    return render(request, 'outdoor/index.html')
 
 
-def map_view(request):
-    return render(request, "outdoor/map.html")
+def create_event(request: HttpRequest):
+    return render(request, "outdoor/new_event.html")
 
 
-def locations_json(request):
-    return JsonResponse(list(
-        OutdoorLocation.objects.values("id", "name", "description", "lat", "lng")
-    ), safe=False)
+class NewEventAPIView(generics.ListCreateAPIView):
+    """
+    API view to handle listing and creating new outdoor activity events.
 
+    - GET: Retrieve a list of all events ordered by creation date (latest first).
+    - POST: Create a new event with the provided details.
+    """
 
-def activities_json(request):
-    data = []
-    for act in OutdoorActivity.objects.select_related("location"):
-        data.append({
-            "id": act.id,
-            "name": act.name,
-            "activity": act.activity,
-            "lat": act.lat,
-            "lng": act.lng,
-            "notes": act.notes,
-            "location": act.location.name if act.location else "Unlinked"
-        })
-    return JsonResponse(data, safe=False)
+    queryset = OutdoorActivity.objects.all().order_by("-created_at")
+    serializer_class = NewEventSerializer
+    def post(self, request: Request, *args: Dict[Any, Any], **kwargs: Dict[Any, Any]):
+        """
+        Handle the creation of a new event.
 
+        Args:
+            request (Request): The HTTP request object containing event data.
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
 
-def haversine(lat1, lon1, lat2, lon2):
-    """Distance in km between two lat/lng points."""
-    R = 6371
-    dlat, dlon = math.radians(lat2 - lat1), math.radians(lon2 - lon1)
-    a = math.sin(dlat/2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon/2)**2
-    return 2 * R * math.asin(math.sqrt(a))
+        Body:
+            - title: str
+            - category: str
+            - description: str
+            - latitude: float
+            - longitude: float
+            - created_at: datetime
 
-
-@require_POST
-@csrf_exempt
-def add_activity(request):
-    lat, lng = float(request.POST["lat"]), float(request.POST["lng"])
-
-    # find nearest location
-    locations = OutdoorLocation.objects.all()
-    nearest = min(locations, key=lambda loc: haversine(lat, lng, loc.lat, loc.lng), default=None)
-
-    if not nearest:
-        return JsonResponse({"error": "No Outdoor Locations defined!"}, status=400)
-
-    act = OutdoorActivity.objects.create(
-        name=request.POST["name"],
-        activity=request.POST.get("activity", "other"),
-        lat=lat,
-        lng=lng,
-        notes=request.POST.get("notes", ""),
-        location=nearest
-    )
-
-    return JsonResponse({
-        "id": act.id,
-        "name": act.name,
-        "activity": act.activity,
-        "lat": act.lat,
-        "lng": act.lng,
-        "notes": act.notes,
-        "location": nearest.name
-    })
+        Returns:
+            Response: 
+                - 201 Created with serialized event data if successful.
+                - 400 Bad Request with validation errors if input is invalid.
+        """
+        data = request.data
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

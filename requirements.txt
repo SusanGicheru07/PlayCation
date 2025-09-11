@@ -1,13 +1,12 @@
-asgiref==3.9.1
-Django==5.2.6
-python-decouple==3.8
-sqlparse==0.5.3
-typing_extensions==4.15.0
-
+asgiref
+Django
+python-decouple
+sqlparse
+typing_extensions
 pydub
 librosa
 soundfile
 numpy
-
+gunicorn
 channels==4.3.1
 
